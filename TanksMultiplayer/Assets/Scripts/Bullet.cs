@@ -6,9 +6,8 @@ using UnityEngine.Networking;
 public class Bullet : NetworkBehaviour
 {
 
-    public int damage = 10;
+    public int bulletDamage = 10;
     public float bulletSpeed = 3.0f;
-    //public Vector3 velocity;
     public AudioClip audioShoot = null;
     public AudioClip audioHit = null;
 
@@ -20,16 +19,19 @@ public class Bullet : NetworkBehaviour
     {
         this.transform.Translate(0, -bulletSpeed * Time.deltaTime, 0);
     }
-
-    //transform.Translate(0, -bulletSpeed * Time.deltaTime, 0);
-    //transform.position += velocity * Time.deltaTime * bulletSpeed;
-
     void OnTriggerEnter2D(Collider2D other)
     {
-
         this.GetComponent<AudioSource>().PlayOneShot(audioHit);
         this.GetComponent<SpriteRenderer>().enabled = false;
         this.GetComponent<Collider2D>().enabled = false;
+
+        var hit = other.gameObject;
+        var health = hit.GetComponent<PlayerHealth>();
+        if (health != null)
+        {
+            health.TakeDamage(bulletDamage);
+        }
+
         Destroy(this.gameObject, audioHit.length);
     }
 }

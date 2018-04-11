@@ -193,7 +193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d2e6c69d7da1c44a04f2a508c4b874, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitpoint: 10
+  bulletDamage: 10
   bulletSpeed: 3
   audioShoot: {fileID: 8300000, guid: ceb796882347c114bac3c6f013005425, type: 3}
   audioHit: {fileID: 8300000, guid: 9a0a06ab2a5c0c84fb11f5d5ebee66f8, type: 3}

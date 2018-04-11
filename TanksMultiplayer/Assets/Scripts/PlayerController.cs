@@ -6,20 +6,14 @@ using UnityEngine.Networking;
 public class PlayerController : NetworkBehaviour
 {
     public float movementSpeed = 1.5f;
-    //public float bulletSpeed = 3.0f;
     public AudioClip audioDriving = null;
     public GameObject bulletPrefab = null;
     public Transform socket = null;
-    private float shootCooldown = 0.8f;
-    private float shootTimer = 0f;
+    private bool shootCooldown = false;
 
     public override void OnStartLocalPlayer()
     {
         tag = "Player";
-    }
-    void Reset()
-    {
-        socket = transform.Find("socket");
     }
     private void Update()
     {
@@ -27,11 +21,19 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
+
         Move();
+
         if (Input.GetButtonDown("Fire1"))
         {
-            Cmd_Shoot();
+            if (shootCooldown == false)
+            {
+                Cmd_Shoot();
+                Invoke("ResetCooldown", 0.8f);
+                shootCooldown = true;
+            }
         }
+
     }
 
     private void GetMovement()
@@ -41,48 +43,39 @@ public class PlayerController : NetworkBehaviour
     }
     private void Move()
     {
-        if (Input.GetKey(KeyCode.W))
+        if ((Input.GetKey(KeyCode.W)) || (Input.GetKey(KeyCode.UpArrow)))
         {
             transform.localRotation = Quaternion.Euler(180, 0, 0);
             GetMovement();
             return;
         }
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.S) || (Input.GetKey(KeyCode.DownArrow)))
         {
             transform.localRotation = Quaternion.Euler(0, 0, 0);
             GetMovement();
             return;
         }
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D) || (Input.GetKey(KeyCode.RightArrow)))
         {
             transform.localRotation = Quaternion.Euler(0, 0, 90);
             GetMovement();
             return;
         }
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.LeftArrow)))
         {
             transform.localRotation = Quaternion.Euler(0, 0, -90);
             GetMovement();
             return;
         }
     }
-    [Command] public void Cmd_Shoot()
+    private void ResetCooldown()
     {
-        /*shootTimer += Time.deltaTime;
-        if (shootTimer < shootCooldown)
-        {
-            return;
-        }
-*/
-        //if (Input.GetButtonDown("Fire1"))
-        //{
-            GameObject obj = Instantiate(bulletPrefab, socket.position, socket.rotation) as GameObject;
-            //Destroy(obj, 2.0f);
-            //obj.GetComponent<Transform>().Translate(0, -bulletSpeed * Time.deltaTime, 0);
-            NetworkServer.Spawn(obj);
-            //shootTimer = 0;
-        //}
+        shootCooldown = false;
     }
-
-
+    [Command]
+    public void Cmd_Shoot()
+    {
+        GameObject obj = Instantiate(bulletPrefab, socket.position, socket.rotation) as GameObject;
+        NetworkServer.Spawn(obj);
+    }
 }

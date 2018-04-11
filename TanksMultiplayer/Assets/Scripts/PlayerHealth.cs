@@ -1,36 +1,49 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 
 public class PlayerHealth : NetworkBehaviour
 {
-	public const int maxHealth = 100;
-    [SyncVar]
-    public int health = maxHealth;
+    public const int maxHealth = 100;
+    [SyncVar(hook = "OnChangeHealth")]
+    public int currentHealth = maxHealth;
+
+    public Text healthText = null;
+
+    void Start()
+    {
+        healthText = GameObject.Find("healthText").GetComponent<Text>();
+        SetHealthText();
+    }
     public void TakeDamage(int amount)
     {
         if (!isServer)
         {
             return;
         }
-        if (health > 0)
+
+        currentHealth -= amount;
+        Debug.Log("Hero health: " + currentHealth);
+
+        if (currentHealth <= 0)
         {
-            health -= amount;
-            Debug.Log("Hero health: " + health);
-        }
-        else
-        {
-            Debug.Log("Game Over");
+            currentHealth = 0;
+            Debug.Log("Player is dead!");
             Destroy(this.gameObject);
         }
     }
-	    void OnTriggerEnter2D(Collider2D other)
+    void SetHealthText()
     {
-        if(other.tag == "Enemy")
+        if (isLocalPlayer)
         {
-            var damage = other.GetComponent<Bullet>().damage;
-            TakeDamage(damage);
+            healthText.text = "Health: " + currentHealth.ToString();
         }
+    }
+    void OnChangeHealth(int health)
+    {
+        currentHealth = health;
+        SetHealthText();
     }
 }
