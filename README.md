@@ -1,2 +1,2 @@
 # TanksMultiplayer
-A unity multiplayer game repository, using UNET
+A unity multiplayer game repository, using PHOTON
