@@ -8,12 +8,17 @@ public class PlayerAnimatorManager : Photon.MonoBehaviour
     #region PUBLIC PROPERTIES
     public float movementSpeed = 1.5f;
     public AudioClip audioDriving = null;
+    public GameObject bulletPrefab = null;
+    public Transform socket = null;
+    #endregion
+
+    #region PUBLIC PROPERTIES
+    private bool shootCooldown = false;
     #endregion
 
     #region MONOBEHAVIOUR MESSAGES
     void Start()
     {
-
     }
     void Update()
     {
@@ -22,8 +27,19 @@ public class PlayerAnimatorManager : Photon.MonoBehaviour
             return;
         }
         Move();
+        if (Input.GetButtonDown("Fire1"))
+        {
+            if (shootCooldown == false)
+            {
+                Shoot();
+                Invoke("ResetCooldown", 0.8f);
+                shootCooldown = true;
+            }
+        }
     }
     #endregion
+
+    #region Private Methods
     private void GetMovement()
     {
         transform.Translate(0, -movementSpeed * Time.deltaTime, 0);
@@ -56,4 +72,16 @@ public class PlayerAnimatorManager : Photon.MonoBehaviour
             return;
         }
     }
+    private void Shoot()
+    {
+        if (Input.GetButtonDown("Fire1"))
+        {
+            PhotonNetwork.Instantiate(bulletPrefab.name, socket.position, socket.rotation, 0);
+        }
+    }
+    private void ResetCooldown()
+    {
+        shootCooldown = false;
+    }
+    #endregion
 }

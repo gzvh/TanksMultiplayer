@@ -269,7 +269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9ec15d04dd67f34386d93eae1327bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Beams: {fileID: 1220557945704168, guid: ceec760d4a4d5854f8b2da8abb945572, type: 2}
+  Barrel: {fileID: 1220557945704168, guid: ceec760d4a4d5854f8b2da8abb945572, type: 2}
   Health: 1
   PlayerUiPrefab: {fileID: 1394362506751900, guid: 3443d4d4616328447ac4e72108e3647a,
     type: 2}
@@ -286,6 +286,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 1.5
   audioDriving: {fileID: 8300000, guid: 37eb56580746ab54db540a4be63c0a02, type: 3}
+  bulletPrefab: {fileID: 1220557945704168, guid: ceec760d4a4d5854f8b2da8abb945572,
+    type: 2}
+  socket: {fileID: 4261546621023544}
 --- !u!114 &114800323116646212
 MonoBehaviour:
   m_ObjectHideFlags: 1

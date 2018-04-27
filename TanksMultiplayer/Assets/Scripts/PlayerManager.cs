@@ -1,23 +1,19 @@
-﻿#if UNITY_5 && (!UNITY_5_0 && !UNITY_5_1 && !UNITY_5_2 && ! UNITY_5_3) || UNITY_2017
-#define UNITY_MIN_5_4
-#endif
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
 
 /// <summary>
 /// Player manager. 
-/// Handles fire Input and Beams.
+/// Handles fire Input and Barrel.
 /// </summary>
 public class PlayerManager : Photon.PunBehaviour, IPunObservable
 {
 
     #region Public Variables
-    [Tooltip("The Beams GameObject to control")]
-    public GameObject Beams;
+    [Tooltip("The Barrel GameObject to control")]
+    public GameObject Barrel;
     [Tooltip("The current Health of our player")]
-    public float Health = 1f;
+    public int Health = 100;
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject LocalPlayerInstance;
     [Tooltip("The Player's UI GameObject Prefab")]
@@ -51,17 +47,17 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
         {
             return;
         }
-        this.Health -= 0.1f;
+        this.Health -= 15;
     }
     void Awake()
     {
-        if (this.Beams == null)
+        if (this.Barrel == null)
         {
             Debug.LogError("<Color=Red><a>Missing</a></Color> Beams Reference.", this);
         }
         else
         {
-            this.Beams.SetActive(false);
+            this.Barrel.SetActive(false);
         }
         // #Important
         // used in GameManager.cs: we keep track of the localPlayer instance to prevent instantiation when levels are synchronized
@@ -104,15 +100,15 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
         if (photonView.isMine)
         {
             ProcessInputs();
-            if (this.Health <= 0f)
+            if (this.Health <= 0)
             {
                 GameManager.Instance.LeaveRoom();
             }
         }
         // trigger Beams active state 
-        if (Beams != null && this.IsFiring != this.Beams.GetActive())
+        if (Barrel != null && this.IsFiring != this.Barrel.GetActive())
         {
-            this.Beams.SetActive(this.IsFiring);
+            this.Barrel.SetActive(this.IsFiring);
         }
     }
 #if !UNITY_MIN_5_4_OR_NEWER
@@ -205,7 +201,7 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
         {
             // Network player, receive data
             this.IsFiring = (bool)stream.ReceiveNext();
-            this.Health = (float)stream.ReceiveNext();
+            this.Health = (int)stream.ReceiveNext();
         }
     }
     #endregion

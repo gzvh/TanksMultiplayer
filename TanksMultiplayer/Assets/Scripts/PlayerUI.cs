@@ -10,16 +10,11 @@ public class PlayerUI : MonoBehaviour
     public Text PlayerNameText;
     [Tooltip("UI Slider to display Player's Health")]
     public Slider PlayerHealthSlider;
-    [Tooltip("Pixel offset from the player target")]
-    public Vector3 ScreenOffset = new Vector3(0f, 30f, 0f);
     #endregion
 
 
     #region Private Properties
     PlayerManager _target;
-    float _characterControllerHeight = 0f;
-    Transform _targetTransform;
-    Vector3 _targetPosition;
     #endregion
 
 
@@ -30,17 +25,25 @@ public class PlayerUI : MonoBehaviour
     }
     void Update()
     {
-        // Reflect the Player Health
-        if (PlayerHealthSlider != null)
+        if (PhotonNetwork.isMasterClient)
         {
-            PlayerHealthSlider.value = _target.Health;
+            // Reflect the Player Health
+            if (PlayerHealthSlider != null)
+            {
+                PlayerHealthSlider.value = _target.Health;
+            }
+            // Destroy itself if the target is null, It's a fail safe when Photon is destroying Instances of a Player over the network
+            if (_target == null)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
         }
-        // Destroy itself if the target is null, It's a fail safe when Photon is destroying Instances of a Player over the network
-        if (_target == null)
+        else
         {
-            Destroy(this.gameObject);
             return;
         }
+
     }
     #endregion
 
