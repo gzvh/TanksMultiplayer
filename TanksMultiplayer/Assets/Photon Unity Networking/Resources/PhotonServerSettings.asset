@@ -42,4 +42,9 @@ MonoBehaviour:
   - RequestForPickupItems
   - RequestForPickupTimes
   - TaggedPlayer
+  - changeDirection_Left
+  - destroyOBJ
+  - onSpriteFlipFalse
+  - onSpriteFlipTrue
+  - reduceHealt
   DisableAutoOpenWizard: 1

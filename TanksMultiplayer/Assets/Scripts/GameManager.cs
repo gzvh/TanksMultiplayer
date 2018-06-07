@@ -22,7 +22,7 @@ public class GameManager : Photon.PunBehaviour
         spawnSpots = GameObject.FindGameObjectsWithTag("Respawn");
         if (playerPrefab == null)
         {
-            Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
+            Debug.LogError("<Color=Red>Missing</Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
         }
         else
         {
@@ -65,7 +65,6 @@ public class GameManager : Photon.PunBehaviour
         }
     }
     #endregion
-
 
     #region Public Methods
     public void LeaveRoom()

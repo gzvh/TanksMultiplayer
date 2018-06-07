@@ -18,22 +18,19 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
     public static GameObject LocalPlayerInstance;
     [Tooltip("The Player's UI GameObject Prefab")]
     public GameObject PlayerUiPrefab;
+    public GameObject sceneCam;
     #endregion
 
     #region Private Variables
     //True, when the user is firing
     bool IsFiring;
+    Vector3 selfPos;
+    
     #endregion
 
     #region MonoBehaviour CallBacks
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
-    /// </summary>
-    /// <summary>
-    /// MonoBehaviour method called when the Collider 'other' enters the trigger.
-    /// Affect Health of the Player if the collider is a beam
-    /// Note: when jumping and firing at the same, you'll find that the player's own beam intersects with itself
-    /// One could move the collider further away to prevent this or check if the beam belongs to the player.
     /// </summary>
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -47,24 +44,20 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
         {
             return;
         }
-        this.Health -= 15;
+        this.Health -= 10;
     }
     void Awake()
     {
-        if (this.Barrel == null)
-        {
-            Debug.LogError("<Color=Red><a>Missing</a></Color> Beams Reference.", this);
-        }
-        else
-        {
-            this.Barrel.SetActive(false);
-        }
         // #Important
         // used in GameManager.cs: we keep track of the localPlayer instance to prevent instantiation when levels are synchronized
         if (photonView.isMine)
         {
             LocalPlayerInstance = gameObject;
         }
+        sceneCam = GameObject.Find("Main Camera");
+        sceneCam.SetActive(true);
+        PhotonNetwork.sendRate = 30;
+        PhotonNetwork.sendRateOnSerialize = 20;
         // #Critical
         // we flag as don't destroy on load so that instance survives level synchronization, thus giving a seamless experience when levels load.
         DontDestroyOnLoad(gameObject);
@@ -72,15 +65,18 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
     }
     void Start()
     {
-        if (PlayerUiPrefab != null)
+        /*if (this.PlayerUiPrefab != null)
         {
-            GameObject _uiGo = Instantiate(this.PlayerUiPrefab) as GameObject;
-            _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
+            if (photonView.isMine == true)
+            {
+                GameObject _uiGo = Instantiate(this.PlayerUiPrefab) as GameObject;
+                _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
+            }
         }
         else
         {
             Debug.LogWarning("<Color=Red><a>Missing</a></Color> PlayerUiPrefab reference on player Prefab.", this);
-        }
+        }*/
 #if UNITY_MIN_5_4
         // Unity 5.4 has a new scene management. register a method to call CalledOnLevelWasLoaded.
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
@@ -97,7 +93,7 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
     /// </summary>
     void Update()
     {
-        if (photonView.isMine)
+        if (this.photonView.isMine)
         {
             ProcessInputs();
             if (this.Health <= 0)
@@ -106,10 +102,10 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
             }
         }
         // trigger Beams active state 
-        if (Barrel != null && this.IsFiring != this.Barrel.GetActive())
+       /* if (Barrel != null && this.IsFiring != this.Barrel.GetActive())
         {
             this.Barrel.SetActive(this.IsFiring);
-        }
+        }*/
     }
 #if !UNITY_MIN_5_4_OR_NEWER
     /// <summary>See CalledOnLevelWasLoaded. Outdated in Unity 5.4.</summary>
@@ -138,7 +134,6 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
     /// </summary>
     void ProcessInputs()
     {
-
         if (Input.GetButtonDown("Fire1"))
         {
             // we don't want to fire when we interact with UI buttons for example. IsPointerOverGameObject really means IsPointerOver*UI*GameObject
@@ -152,43 +147,10 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
                 this.IsFiring = true;
             }
         }
-
-        if (Input.GetButtonUp("Fire1"))
-        {
-            if (this.IsFiring)
-            {
-                this.IsFiring = false;
-            }
-        }
     }
     #endregion
 
     #region IPunObservable implementation
-    /*void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.isWriting)
-        {
-            // We own this player: send the others our data
-            stream.SendNext(IsFiring);
-        }
-        else
-        {
-            // Network player, receive data
-            this.IsFiring = (bool)stream.ReceiveNext();
-        }
-        if (stream.isWriting)
-        {
-            // We own this player: send the others our data
-            stream.SendNext(IsFiring);
-            stream.SendNext(Health);
-        }
-        else
-        {
-            // Network player, receive data
-            this.IsFiring = (bool)stream.ReceiveNext();
-            this.Health = (float)stream.ReceiveNext();
-        }
-    } */
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.isWriting)
@@ -196,12 +158,14 @@ public class PlayerManager : Photon.PunBehaviour, IPunObservable
             // We own this player: send the others our data
             stream.SendNext(this.IsFiring);
             stream.SendNext(this.Health);
+            stream.SendNext(this.transform.position);
         }
         else
         {
             // Network player, receive data
             this.IsFiring = (bool)stream.ReceiveNext();
             this.Health = (int)stream.ReceiveNext();
+            this.selfPos = (Vector3)stream.ReceiveNext();
         }
     }
     #endregion

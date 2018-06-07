@@ -8,13 +8,7 @@ using UnityEngine.SceneManagement;
 public class Launcher : Photon.PunBehaviour
 {
     #region Public Variables
-    /// <summary>
-    /// The PUN loglevel. 
-    /// </summary>
-    public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
-    /// <summary>
-    /// The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created.
-    /// </summary>   
+    public PhotonLogLevel Loglevel = PhotonLogLevel.Informational; 
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
     public byte MaxPlayersPerRoom = 4;
     [Tooltip("The Ui Panel to let the user enter name, connect and play")]
@@ -25,23 +19,12 @@ public class Launcher : Photon.PunBehaviour
 
 
     #region Private Variables
-    /// <summary>
-    /// This client's version number. Users are separated from each other by gameversion (which allows you to make breaking changes).
-    /// </summary>
-    string _gameVersion = "1";
-    /// <summary>
-    /// Keep track of the current process. Since connection is asynchronous and is based on several callbacks from Photon, 
-    /// we need to keep track of this to properly adjust the behavior when we receive call back by Photon.
-    /// Typically this is used for the OnConnectedToMaster() callback.
-    /// </summary>
+    string gameVersion = "1";
     bool isConnecting;
     #endregion
 
 
     #region MonoBehaviour CallBacks
-    /// <summary>
-    /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
-    /// </summary>
     void Awake()
     {
         // #Critical
@@ -54,9 +37,6 @@ public class Launcher : Photon.PunBehaviour
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
         PhotonNetwork.automaticallySyncScene = true;
     }
-    /// <summary>
-    /// MonoBehaviour method called on GameObject by Unity during initialization phase.
-     /// </summary>
     void Start()
     {
         progressLabel.SetActive(false);
@@ -88,7 +68,7 @@ public class Launcher : Photon.PunBehaviour
         {
             Debug.Log("Connecting...");
             // #Critical, we must first and foremost connect to Photon Online Server.
-            PhotonNetwork.ConnectUsingSettings(_gameVersion);
+            PhotonNetwork.ConnectUsingSettings(gameVersion);
         }
     }
     #endregion
@@ -114,19 +94,19 @@ public class Launcher : Photon.PunBehaviour
         isConnecting = false;
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
-        Debug.LogWarning("DemoAnimator/Launcher: OnDisconnectedFromPhoton() was called by PUN");
+        Debug.LogWarning("Launcher: OnDisconnectedFromPhoton() was called by PUN");
     }
 
     public override void OnPhotonRandomJoinFailed(object[] codeAndMsg)
     {
-        Debug.Log("DemoAnimator/Launcher:OnPhotonRandomJoinFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom(null, new RoomOptions() {maxPlayers = 4}, null);");
+        Debug.Log("Launcher:OnPhotonRandomJoinFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom(null, new RoomOptions() {maxPlayers = 4}, null);");
         // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = this.MaxPlayersPerRoom }, null);
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("DemoAnimator/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+        Debug.Log("Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
         Debug.Log("<Color=Green>OnJoinedRoom</Color> with "+PhotonNetwork.room.PlayerCount+" Player(s)");
         // #Critical: We only load if we are the first player, else we rely on  PhotonNetwork.automaticallySyncScene to sync our instance scene.
         if (PhotonNetwork.room.PlayerCount == 1)
@@ -138,6 +118,4 @@ public class Launcher : Photon.PunBehaviour
         }
     }
     #endregion
-
-
 }

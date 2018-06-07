@@ -12,14 +12,11 @@ public class PlayerAnimatorManager : Photon.MonoBehaviour
     public Transform socket = null;
     #endregion
 
-    #region PUBLIC PROPERTIES
+    #region PRIVATE PROPERTIES
     private bool shootCooldown = false;
     #endregion
 
     #region MONOBEHAVIOUR MESSAGES
-    void Start()
-    {
-    }
     void Update()
     {
         if (photonView.isMine == false && PhotonNetwork.connected == true)

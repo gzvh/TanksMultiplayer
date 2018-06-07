@@ -22,7 +22,14 @@ public class Bullet : MonoBehaviour
         this.GetComponent<AudioSource>().PlayOneShot(audioHit);
         this.GetComponent<SpriteRenderer>().enabled = false;
         this.GetComponent<Collider2D>().enabled = false;
-        Destroy(this.gameObject, audioHit.length);
+        Invoke("DestroyCooldown", 0.3f);
+    }
+    #endregion
+
+    #region Private Methods
+    private void DestroyCooldown()
+    {
+        PhotonNetwork.Destroy(this.gameObject);
     }
     #endregion
 }
