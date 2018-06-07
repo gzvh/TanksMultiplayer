@@ -47,4 +47,11 @@ MonoBehaviour:
   - onSpriteFlipFalse
   - onSpriteFlipTrue
   - reduceHealt
+  - onSpriteFlipDown
+  - onSpriteFlipLeft
+  - onSpriteFlipRight
+  - onSpriteFlipUp
+  - changeDirection_Down
+  - changeDirection_Right
+  - changeDirection_Up
   DisableAutoOpenWizard: 1

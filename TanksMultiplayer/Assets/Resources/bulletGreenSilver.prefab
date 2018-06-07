@@ -23,7 +23,8 @@ GameObject:
   - component: {fileID: 50171650508614184}
   - component: {fileID: 70147753540870186}
   - component: {fileID: 82128231491242186}
-  - component: {fileID: 114838358024403882}
+  - component: {fileID: 114919951782321670}
+  - component: {fileID: 114387080185250190}
   m_Layer: 8
   m_Name: bulletGreenSilver
   m_TagString: Enemy
@@ -159,7 +160,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &114838358024403882
+--- !u!114 &114387080185250190
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -167,12 +168,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 1220557945704168}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b95a239b735f2047b9d9db26c2f3045, type: 3}
+  m_Script: {fileID: 11500000, guid: 03088da78fc24e948992b9ed96ff4def, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 3
-  audioShoot: {fileID: 8300000, guid: ceb796882347c114bac3c6f013005425, type: 3}
-  audioHit: {fileID: 8300000, guid: 9a0a06ab2a5c0c84fb11f5d5ebee66f8, type: 3}
+  movingDirection: 0
+  movingSpeed: 4
+  destroyTime: 2
+--- !u!114 &114919951782321670
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1220557945704168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  OwnerShipWasTransfered: 0
+  prefixBackup: -1
+  synchronization: 0
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 0}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  currentMasterID: -1
+  isRuntimeInstantiated: 0
 --- !u!212 &212172042835856722
 SpriteRenderer:
   m_ObjectHideFlags: 1

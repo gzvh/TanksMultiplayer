@@ -10,7 +10,7 @@ public class PlayerMove : Photon.MonoBehaviour
     public bool devTesting = false;
     [Space]
     [Header("General floats")]
-    public float moveSpeed = 1.5f;
+    public float movementSpeed = 1.5f;
     [Space]
     public GameObject playerCam;
     public Text playerName;
@@ -18,7 +18,13 @@ public class PlayerMove : Photon.MonoBehaviour
     private GameObject sceneCam;
     public Color enemyTextColor;
     public GameObject bulletPrefab;
-    public SpriteRenderer sprite;
+    [Space]
+    [Header("Sprite swaps")]
+    public Sprite spriteLeft;
+    public Sprite spriteRight;
+    public Sprite spriteUp;
+    public Sprite spriteDown;
+    private bool facingLeft, facingRight, facingUp, facingDown = false;
 
     void Awake()
     {
@@ -55,59 +61,83 @@ public class PlayerMove : Photon.MonoBehaviour
     private void checkInput()
     {
         var move = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        transform.position += move * moveSpeed * Time.deltaTime;
+        transform.position += move * movementSpeed * Time.deltaTime;
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            sprite.flipX = false;
-            photonView.RPC("onSpriteFlipFalse", PhotonTargets.Others);
+            this.GetComponent<SpriteRenderer>().sprite = spriteRight;
+            photonView.RPC("onSpriteFlipRight", PhotonTargets.Others);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            sprite.flipX = true;
-            photonView.RPC("onSpriteFlipTrue", PhotonTargets.Others);
+            this.GetComponent<SpriteRenderer>().sprite = spriteLeft;
+            photonView.RPC("onSpriteFlipLeft", PhotonTargets.Others);
         }
         else if (Input.GetKeyDown(KeyCode.W))
         {
-            sprite.flipX = true;
-            photonView.RPC("onSpriteFlipTrue", PhotonTargets.Others);
+            this.GetComponent<SpriteRenderer>().sprite = spriteUp;
+            photonView.RPC("onSpriteFlipUp", PhotonTargets.Others);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            sprite.flipX = false;
-            photonView.RPC("onSpriteFlipFalse", PhotonTargets.Others);
+            this.GetComponent<SpriteRenderer>().sprite = spriteDown;
+            photonView.RPC("onSpriteFlipDown", PhotonTargets.Others);
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             shoot();
         }
+    }
 
+    [PunRPC]
+    private void onSpriteFlipRight()
+    {
+        this.GetComponent<SpriteRenderer>().sprite = spriteRight;
+        facingRight = true;
     }
     [PunRPC]
-    private void onSpriteFlipTrue()
+    private void onSpriteFlipLeft()
     {
-        sprite.flipX = true;
+        this.GetComponent<SpriteRenderer>().sprite = spriteLeft;
+        facingLeft = true;
     }
     [PunRPC]
-    private void onSpriteFlipFalse()
+    private void onSpriteFlipUp()
     {
-        sprite.flipX = false;
+        this.GetComponent<SpriteRenderer>().sprite = spriteUp;
+        facingUp = true;
+    }
+    [PunRPC]
+    private void onSpriteFlipDown()
+    {
+        this.GetComponent<SpriteRenderer>().sprite = spriteDown;
+        facingDown = true;
     }
 
     private void shoot()
     {
         if (!devTesting)
         {
-            if (sprite.flipX == false)
+            if (facingRight == true)
+            {
+                GameObject obj = PhotonNetwork.Instantiate(bulletPrefab.name, new Vector2(this.transform.position.x, this.transform.position.y), Quaternion.identity, 0);
+            }
+            else if (facingLeft == true)
             {
                 GameObject obj = PhotonNetwork.Instantiate(bulletPrefab.name, new Vector2(this.transform.position.x, this.transform.position.y), Quaternion.identity, 0);
                 obj.GetComponent<PhotonView>().RPC("changeDirection_Left", PhotonTargets.AllBuffered);
             }
-            else
+            else if (facingDown == true)
             {
                 GameObject obj = PhotonNetwork.Instantiate(bulletPrefab.name, new Vector2(this.transform.position.x, this.transform.position.y), Quaternion.identity, 0);
-                obj.GetComponent<PhotonView>().RPC("changeDirection_Left", PhotonTargets.AllBuffered);
+                obj.GetComponent<PhotonView>().RPC("changeDirection_Down", PhotonTargets.AllBuffered);
+            }
+            else if(facingUp == true)
+            {
+                GameObject obj = PhotonNetwork.Instantiate(bulletPrefab.name, new Vector2(this.transform.position.x, this.transform.position.y), Quaternion.identity, 0);
+                obj.GetComponent<PhotonView>().RPC("changeDirection_Up", PhotonTargets.AllBuffered);
+
             }
         }
     }
@@ -115,7 +145,7 @@ public class PlayerMove : Photon.MonoBehaviour
     {
         transform.position = Vector3.Lerp(transform.position, selfPos, Time.deltaTime * 10);
     }
-    private void OnPhotonSerializedView(PhotonStream stream, PhotonMessageInfo info)
+    private void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.isWriting)
         {
